@@ -11,13 +11,13 @@ namespace Plugins.Clean.Tests
         [Test]
         public void ComponentProperties_Text_CopiesText()
         {
-            var go = new GameObject();
-            var text = go.AddComponent<Text>();
+            var go1 = new GameObject();
+            var text = go1.AddComponent<Text>();
             text.text = "testing123";
             var copy = new ComponentProperties.Text(text);
-        
-            Object.DestroyImmediate(text);
-            var tmp = go.AddComponent<TextMeshProUGUI>();
+
+            var go2 = new GameObject();
+            var tmp = go2.AddComponent<TextMeshProUGUI>();
             copy.Apply(tmp);
         
             Assert.AreEqual("testing123", tmp.text);

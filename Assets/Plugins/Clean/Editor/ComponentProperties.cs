@@ -50,7 +50,7 @@ namespace Plugins.Clean.Editor
             public TextMeshProUGUI Apply(TextMeshProUGUI tmp)
             {
                 tmp.rectTransform.sizeDelta = sizeDelta;
-                // TODO: Alignment GetTMPAlignment()
+                tmp.alignment = Util.GetTMPAlignment(alignment, alignByGeometry);
                 tmp.enableAutoSizing = bestFit;
                 tmp.fontSizeMin = bestFitMinSize;
                 tmp.fontSizeMax = bestFitMaxSize;
@@ -58,7 +58,7 @@ namespace Plugins.Clean.Editor
                 tmp.enabled = enabled;
                 // TODO: Font + FontMaterial GetCorrespondingTMPFontAsset()
                 tmp.fontSize = fontSize;
-                // TODO: FontStyle GetTMPFontStyle()
+                tmp.fontStyle = Util.GetTMPFontStyle(fontStyle);
                 tmp.enableWordWrapping = horizontalOverflow == HorizontalWrapMode.Wrap;
                 tmp.lineSpacing = (lineSpacing - 1) * 100f;
                 tmp.raycastTarget = raycastTarget;
