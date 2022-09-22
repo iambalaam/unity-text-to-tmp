@@ -1,11 +1,23 @@
 using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
+using Object = UnityEngine.Object;
 
 namespace Plugins.Clean.Editor
 {
     public static class Util
     {
+        public static TextMeshProUGUI UpgradeText(Text t)
+        {
+            var go = t.gameObject;
+            var properties = new ComponentProperties.Text(t);
+            Object.DestroyImmediate(t);
+            var tmp = go.AddComponent<TextMeshProUGUI>();
+            properties.Apply(tmp);
+            return tmp;
+        }
+        
         public static TextAlignmentOptions GetTMPAlignment( TextAnchor alignment, bool alignByGeometry )
         {
             switch( alignment )
