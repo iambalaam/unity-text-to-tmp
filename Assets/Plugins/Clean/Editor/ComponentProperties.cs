@@ -118,13 +118,77 @@ namespace Plugins.Clean.Editor
 
         public class InputField
         {
+            // Properties
+            private bool enabled;
+            private Vector2 sizeDelta;
+            private SelectableObject selectable;
+            private char asteriskChar;
+            private float caretBlinkRate;
+            private bool customCaretColor;
+            private Color? caretColor;
+            private float caretWidth;
+            private int characterLimit;
+            private UnityEngine.UI.InputField.CharacterValidation characterValidation;
+            private UnityEngine.UI.InputField.ContentType contentType;
+            private UnityEngine.UI.InputField.InputType inputType;
+            private TouchScreenKeyboardType keyboardType;
+            private UnityEngine.UI.InputField.LineType lineType;
+            private bool readOnly;
+            private Color selectionColor;
+            private bool shouldHideMobileInput;
+            private string text;
+            // Unity events
+            private object onEndEditEvent;
+            private object onValueChangedEvent;
+
             public InputField(UnityEngine.UI.InputField input)
             {
-                
+                // Properties
+                enabled = input.enabled;
+                sizeDelta = ((RectTransform)input.transform).sizeDelta;
+                selectable = new SelectableObject(input);
+                asteriskChar = input.asteriskChar;
+                caretBlinkRate = input.caretBlinkRate;
+                customCaretColor = input.customCaretColor;
+                if (customCaretColor) caretColor = input.caretColor; // This can throw
+                caretWidth = input.caretWidth;
+                characterLimit = input.characterLimit;
+                characterValidation = input.characterValidation;
+                contentType = input.contentType;
+                inputType = input.inputType;
+                keyboardType = input.keyboardType;
+                lineType = input.lineType;
+                readOnly = input.readOnly;
+                selectionColor = input.selectionColor;
+                shouldHideMobileInput = input.shouldHideMobileInput;
+                text = input.text;
+                // Unity events
+                onEndEditEvent = Util.CopyUnityEvent(input.onEndEdit);
+                onValueChangedEvent = Util.CopyUnityEvent(input.onValueChanged);
             }
-            public TMP_InputField Apply()
+
+            public TMP_InputField Apply(TMP_InputField tmpInput)
             {
-                throw new NotImplementedException();
+                selectable.Apply(tmpInput);
+                ((RectTransform)tmpInput.transform).sizeDelta = sizeDelta;
+                tmpInput.enabled = enabled;
+                tmpInput.asteriskChar = asteriskChar;
+                tmpInput.caretBlinkRate = caretBlinkRate;
+                tmpInput.customCaretColor = customCaretColor;
+                if (caretColor.HasValue) tmpInput.caretColor = caretColor.Value;
+                tmpInput.caretWidth = Mathf.RoundToInt(caretWidth);
+                tmpInput.characterLimit = characterLimit;
+                // TODO
+                // tmpInput.characterValidation = characterValidation;
+                // tmpInput.contentType = contentType;
+                // tmpInput.inputType = inputType;
+                tmpInput.keyboardType = keyboardType;
+                
+                // Unity events
+                Util.PasteUnityEvent(tmpInput.onEndEdit, onEndEditEvent);
+                Util.PasteUnityEvent(tmpInput.onValueChanged, onValueChangedEvent);
+                
+                return tmpInput;
             }
         }
 

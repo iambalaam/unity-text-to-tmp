@@ -15,9 +15,11 @@ namespace Plugins.Clean.Editor
             // Copy properties
             var go = t.gameObject;
             var properties = new ComponentProperties.Text(t);
+            
             // Swap Text component for TextMeshPropUGUI
-            Object.DestroyImmediate(t);
+            Object.DestroyImmediate(t, true);
             var tmp = go.AddComponent<TextMeshProUGUI>();
+            
             // Paste new properties
             properties.Apply(tmp);
             return tmp;
@@ -27,11 +29,25 @@ namespace Plugins.Clean.Editor
         {
             // Copy properties
             var go = input.gameObject;
-            // Copy Events
+            var properties = new ComponentProperties.InputField(input);
+            
+            // Upgrade child components
+            TextMeshProUGUI textComponent = UpgradeText(input.textComponent);
+            Graphic placeholderComponent = (input.placeholder as Text)
+                ? UpgradeText((Text)input.placeholder)
+                : input.placeholder;
+            
             // Swap InputField component with TMP_InputField
+            Object.DestroyImmediate(input, true);
             var tmpInput = go.AddComponent<TMP_InputField>();
+            
+            // Paste child components
+            tmpInput.textComponent = textComponent;
+            tmpInput.placeholder = placeholderComponent;
+
             // Paste new properties
-            // Reapply events
+            properties.Apply(tmpInput);
+            
             return tmpInput;
         }
 

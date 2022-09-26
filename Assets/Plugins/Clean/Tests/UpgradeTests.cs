@@ -77,13 +77,12 @@ namespace Plugins.Clean.Tests
         }
 
         [OneTimeTearDown]
-        public void RemoveTempDir()
+        public void RemoveTmpDir()
         {
             if (Directory.Exists(assetPath))
                 FileUtil.DeleteFileOrDirectory(assetPath);
-            if(File.Exists($"{assetPath}.meta"))
+            if (File.Exists($"{assetPath}.meta"))
                 FileUtil.DeleteFileOrDirectory($"{assetPath}.meta");
-                
         }
     }
 }
