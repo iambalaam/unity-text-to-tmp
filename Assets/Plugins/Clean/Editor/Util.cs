@@ -1,6 +1,8 @@
 using System;
+using System.Reflection;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
@@ -64,6 +66,32 @@ namespace Plugins.Clean.Editor
                 case FontStyle.BoldAndItalic: return FontStyles.Bold | FontStyles.Italic;
                 default: return FontStyles.Normal;
             }
+        }
+
+        // TODO: Investigate if there is/should be a public API for this
+        private static FieldInfo GetUnityPersistentCalls()
+        {
+            var calls = typeof(UnityEventBase).GetField("m_PersistentCalls",
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            if (calls != null) return calls;
+            
+            var listeners = typeof(UnityEventBase).GetField("m_PersistentListeners",
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            if (listeners!= null) return listeners;
+
+            throw new Exception("Could not retrieve m_PersistentCalls to copy Unity Events");
+        }
+
+        public static object CopyUnityEvent(UnityEventBase target)
+        {
+            var field = GetUnityPersistentCalls();
+            return field.GetValue(target);
+        }
+
+        public static void PasteUnityEvent(UnityEventBase target, object unityEvent)
+        {
+            var field = GetUnityPersistentCalls();
+            field.SetValue(target, unityEvent);
         }
     }
 }
