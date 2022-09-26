@@ -175,15 +175,17 @@ namespace Plugins.Clean.Editor
                 tmpInput.asteriskChar = asteriskChar;
                 tmpInput.caretBlinkRate = caretBlinkRate;
                 tmpInput.customCaretColor = customCaretColor;
+                tmpInput.keyboardType = keyboardType;
+                tmpInput.selectionColor = selectionColor;
+                tmpInput.shouldHideMobileInput = shouldHideMobileInput;
+                tmpInput.characterLimit = characterLimit;
+                tmpInput.readOnly = readOnly;
+                tmpInput.text = text;
                 if (caretColor.HasValue) tmpInput.caretColor = caretColor.Value;
                 tmpInput.caretWidth = Mathf.RoundToInt(caretWidth);
-                tmpInput.characterLimit = characterLimit;
-                // TODO
-                // tmpInput.characterValidation = characterValidation;
-                // tmpInput.contentType = contentType;
-                // tmpInput.inputType = inputType;
-                tmpInput.keyboardType = keyboardType;
-                
+                tmpInput.characterValidation = Util.GetTMPCharacterValidation(characterValidation);
+                tmpInput.contentType = Util.GetTMPContentType(contentType);
+                tmpInput.inputType = Util.GetTMPInputType(inputType);
                 // Unity events
                 Util.PasteUnityEvent(tmpInput.onEndEdit, onEndEditEvent);
                 Util.PasteUnityEvent(tmpInput.onValueChanged, onValueChangedEvent);

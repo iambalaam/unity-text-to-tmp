@@ -83,6 +83,60 @@ namespace Plugins.Clean.Editor
                 default: return FontStyles.Normal;
             }
         }
+        
+        public static TMP_InputField.CharacterValidation GetTMPCharacterValidation( InputField.CharacterValidation characterValidation )
+        {
+            switch( characterValidation )
+            {
+                case InputField.CharacterValidation.Alphanumeric: return TMP_InputField.CharacterValidation.Alphanumeric;
+                case InputField.CharacterValidation.Decimal: return TMP_InputField.CharacterValidation.Decimal;
+                case InputField.CharacterValidation.EmailAddress: return TMP_InputField.CharacterValidation.EmailAddress;
+                case InputField.CharacterValidation.Integer: return TMP_InputField.CharacterValidation.Integer;
+                case InputField.CharacterValidation.Name: return TMP_InputField.CharacterValidation.Name;
+                case InputField.CharacterValidation.None: return TMP_InputField.CharacterValidation.None;
+                default: return TMP_InputField.CharacterValidation.None;
+            }
+        }
+        
+        public static TMP_InputField.ContentType GetTMPContentType( InputField.ContentType contentType )
+        {
+            switch( contentType )
+            {
+                case InputField.ContentType.Alphanumeric: return TMP_InputField.ContentType.Alphanumeric;
+                case InputField.ContentType.Autocorrected: return TMP_InputField.ContentType.Autocorrected;
+                case InputField.ContentType.Custom: return TMP_InputField.ContentType.Custom;
+                case InputField.ContentType.DecimalNumber: return TMP_InputField.ContentType.DecimalNumber;
+                case InputField.ContentType.EmailAddress: return TMP_InputField.ContentType.EmailAddress;
+                case InputField.ContentType.IntegerNumber: return TMP_InputField.ContentType.IntegerNumber;
+                case InputField.ContentType.Name: return TMP_InputField.ContentType.Name;
+                case InputField.ContentType.Password: return TMP_InputField.ContentType.Password;
+                case InputField.ContentType.Pin: return TMP_InputField.ContentType.Pin;
+                case InputField.ContentType.Standard: return TMP_InputField.ContentType.Standard;
+                default: return TMP_InputField.ContentType.Standard;
+            }
+        }
+        
+        public static TMP_InputField.InputType GetTMPInputType( InputField.InputType inputType )
+        {
+            switch( inputType )
+            {
+                case InputField.InputType.AutoCorrect: return TMP_InputField.InputType.AutoCorrect;
+                case InputField.InputType.Password: return TMP_InputField.InputType.Password;
+                case InputField.InputType.Standard: return TMP_InputField.InputType.Standard;
+                default: return TMP_InputField.InputType.Standard;
+            }
+        }
+
+        public static TMP_InputField.LineType GetTMPLineType( InputField.LineType lineType )
+        {
+            switch( lineType )
+            {
+                case InputField.LineType.MultiLineNewline: return TMP_InputField.LineType.MultiLineNewline;
+                case InputField.LineType.MultiLineSubmit: return TMP_InputField.LineType.MultiLineSubmit;
+                case InputField.LineType.SingleLine: return TMP_InputField.LineType.SingleLine;
+                default: return TMP_InputField.LineType.SingleLine;
+            }
+        }
 
         // TODO: Investigate if there is/should be a public API for this
         private static FieldInfo GetUnityPersistentCalls()
