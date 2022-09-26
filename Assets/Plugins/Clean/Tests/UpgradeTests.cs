@@ -12,8 +12,6 @@ namespace Plugins.Clean.Tests
 {
     public class UpgradeTests
     {
-        
-
         private static Text CreateText(string text)
         {
             var go = new GameObject();
@@ -21,22 +19,26 @@ namespace Plugins.Clean.Tests
             textComponent.text = text;
             return textComponent;
         }
-        
+
         private static GameObject CreateTextPrefab(string text, string path)
         {
+            GameObject prefab = null;
             var t = CreateText(text);
-            var prefab = PrefabUtility.SaveAsPrefabAsset(t.gameObject, path, out var hasSaved);
+            prefab = PrefabUtility.SaveAsPrefabAsset(t.gameObject, path, out var hasSaved);
             if (!hasSaved) throw new Exception("Could not create prefab");
+            if (prefab == null) throw new Exception("Could not return prefab");
 
             return prefab;
+
         }
 
-        private static string assetPath = "Assets/tmp~";
+        private static string assetPath = "Assets/tmp";
+
         [OneTimeSetUp]
         public void CreateTmpDir()
         {
             if (!Directory.Exists(assetPath))
-                AssetDatabase.CreateFolder("Assets", "tmp~");
+                AssetDatabase.CreateFolder("Assets", "tmp");
         }
 
         [Test]
@@ -52,6 +54,26 @@ namespace Plugins.Clean.Tests
             Assert.IsNotNull(tmp, "Failed to add TextMeshProUGUI component");
             Assert.IsNull(tmp.GetComponent<Text>(), "Failed to remove Text component");
             Assert.AreEqual(tmp.text, testText, "Failed to update text field");
+        }
+
+        [Test]
+        public void CanUpgradeTextPrefab()
+        {
+            var prefabPath = $"{assetPath}/text.prefab";
+            var prefab = CreateTextPrefab("original text", prefabPath);
+            var textInstance = Object.Instantiate(prefab);
+            var textComponent = textInstance.GetComponent<Text>();
+
+            var tmpComponent = Util.UpgradeText(textComponent);
+            PrefabUtility.SaveAsPrefabAsset(tmpComponent.gameObject, prefabPath);
+
+            var tmpInstance = Object.Instantiate(prefab);
+            var tmp = tmpInstance.GetComponent<TextMeshProUGUI>();
+
+            Assert.IsNull(textInstance.GetComponent<Text>(), "Failed to remove Text component from prefab instance");
+            Assert.IsNotNull(textInstance.GetComponent<TextMeshProUGUI>(), "Failed to add TextMeshProUGUI component to existing prefab instance");
+            Assert.IsNotNull(tmp, "Failed to add TextMeshProUGUI component to new prefab instance");
+            Assert.AreEqual(tmp.text, "original text");
         }
 
         [OneTimeTearDown]

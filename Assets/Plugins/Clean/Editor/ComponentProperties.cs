@@ -1,11 +1,49 @@
 using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Plugins.Clean.Editor
 {
     public static class ComponentProperties
     {
+        public class SelectableObject
+        {
+            private readonly AnimationTriggers animationTriggers;
+            private readonly ColorBlock colors;
+            private readonly Image image;
+            private readonly bool interactable;
+            private readonly Navigation navigation;
+            private readonly SpriteState spriteState;
+            private readonly Graphic targetGraphic;
+            private readonly Selectable.Transition transition;
+
+            public SelectableObject( Selectable selectable )
+            {
+                animationTriggers = selectable.animationTriggers;
+                colors = selectable.colors;
+                image = selectable.image;
+                interactable = selectable.interactable;
+                navigation = selectable.navigation;
+                spriteState = selectable.spriteState;
+                targetGraphic = selectable.targetGraphic;
+                transition = selectable.transition;
+            }
+
+            public Selectable Apply( Selectable selectable )
+            {
+                selectable.animationTriggers = animationTriggers;
+                selectable.colors = colors;
+                selectable.image = image;
+                selectable.interactable = interactable;
+                selectable.navigation = navigation;
+                selectable.spriteState = spriteState;
+                selectable.targetGraphic = targetGraphic;
+                selectable.transition = transition;
+                return selectable;
+            }
+        }
+        
         public class Text
         {
             private Vector2 sizeDelta;
@@ -80,6 +118,10 @@ namespace Plugins.Clean.Editor
 
         public class InputField
         {
+            public InputField(UnityEngine.UI.InputField input)
+            {
+                
+            }
             public TMP_InputField Apply()
             {
                 throw new NotImplementedException();

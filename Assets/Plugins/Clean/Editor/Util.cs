@@ -10,14 +10,29 @@ namespace Plugins.Clean.Editor
     {
         public static TextMeshProUGUI UpgradeText(Text t)
         {
+            // Copy properties
             var go = t.gameObject;
             var properties = new ComponentProperties.Text(t);
+            // Swap Text component for TextMeshPropUGUI
             Object.DestroyImmediate(t);
             var tmp = go.AddComponent<TextMeshProUGUI>();
+            // Paste new properties
             properties.Apply(tmp);
             return tmp;
         }
-        
+
+        public static TMP_InputField UpgradeInputField(InputField input)
+        {
+            // Copy properties
+            var go = input.gameObject;
+            // Copy Events
+            // Swap InputField component with TMP_InputField
+            var tmpInput = go.AddComponent<TMP_InputField>();
+            // Paste new properties
+            // Reapply events
+            return tmpInput;
+        }
+
         public static TextAlignmentOptions GetTMPAlignment( TextAnchor alignment, bool alignByGeometry )
         {
             switch( alignment )
