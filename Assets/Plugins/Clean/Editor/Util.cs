@@ -1,6 +1,7 @@
 using System;
 using System.Reflection;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -10,45 +11,58 @@ namespace Plugins.Clean.Editor
 {
     public static class Util
     {
-        public static TextMeshProUGUI UpgradeText(Text t)
+        public static RectTransform CreateInputFieldViewport(TMP_InputField tmp, TextMeshProUGUI textComponent,
+            Graphic placeholderComponent)
         {
-            // Copy properties
-            var go = t.gameObject;
-            var properties = new ComponentProperties.Text(t);
-            
-            // Swap Text component for TextMeshPropUGUI
-            Object.DestroyImmediate(t, true);
-            var tmp = go.AddComponent<TextMeshProUGUI>();
-            
-            // Paste new properties
-            properties.Apply(tmp);
-            return tmp;
-        }
+            RectTransform viewport = null;
+            try
+            {
+                viewport = (RectTransform)new GameObject("Text Area", typeof(RectTransform)).transform;
+                viewport.transform.SetParent(tmp.transform, false);
+                viewport.SetSiblingIndex(textComponent.rectTransform.GetSiblingIndex());
+                viewport.localPosition = textComponent.rectTransform.localPosition;
+                viewport.localRotation = textComponent.rectTransform.localRotation;
+                viewport.localScale = textComponent.rectTransform.localScale;
+                viewport.anchorMin = textComponent.rectTransform.anchorMin;
+                viewport.anchorMax = textComponent.rectTransform.anchorMax;
+                viewport.pivot = textComponent.rectTransform.pivot;
+                viewport.anchoredPosition = textComponent.rectTransform.anchoredPosition;
+                viewport.sizeDelta = textComponent.rectTransform.sizeDelta;
 
-        public static TMP_InputField UpgradeInputField(InputField input)
-        {
-            // Copy properties
-            var go = input.gameObject;
-            var properties = new ComponentProperties.InputField(input);
-            
-            // Upgrade child components
-            TextMeshProUGUI textComponent = UpgradeText(input.textComponent);
-            Graphic placeholderComponent = (input.placeholder as Text)
-                ? UpgradeText((Text)input.placeholder)
-                : input.placeholder;
-            
-            // Swap InputField component with TMP_InputField
-            Object.DestroyImmediate(input, true);
-            var tmpInput = go.AddComponent<TMP_InputField>();
-            
-            // Paste child components
-            tmpInput.textComponent = textComponent;
-            tmpInput.placeholder = placeholderComponent;
+#if UNITY_2018_3_OR_NEWER
+                PrefabUtility.RecordPrefabInstancePropertyModifications(viewport.gameObject);
+                PrefabUtility.RecordPrefabInstancePropertyModifications(viewport.transform);
+#endif
 
-            // Paste new properties
-            properties.Apply(tmpInput);
-            
-            return tmpInput;
+                for (int i = tmp.transform.childCount - 1; i >= 0; i--)
+                {
+                    Transform child = tmp.transform.GetChild(i);
+                    if (child == viewport)
+                        continue;
+
+                    if (child == textComponent.rectTransform ||
+                        (placeholderComponent && child == placeholderComponent.rectTransform))
+                    {
+                        child.SetParent(viewport, true);
+                        child.SetSiblingIndex(0);
+
+#if UNITY_2018_3_OR_NEWER
+                        PrefabUtility.RecordPrefabInstancePropertyModifications(child);
+#endif
+                    }
+                }
+            }
+            catch
+            {
+                if (viewport)
+                {
+                    Object.DestroyImmediate(viewport);
+                }
+
+                throw;
+            }
+
+            return viewport;
         }
 
         public static TextAlignmentOptions GetTMPAlignment( TextAnchor alignment, bool alignByGeometry )

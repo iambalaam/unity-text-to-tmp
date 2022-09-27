@@ -48,7 +48,7 @@ namespace Plugins.Clean.Tests
             var textComponent = CreateText(testText);
             var go = textComponent.gameObject;
 
-            Util.UpgradeText(textComponent);
+            Upgrade.UpgradeText(textComponent);
 
             var tmp = go.GetComponent<TextMeshProUGUI>();
             Assert.IsNotNull(tmp, "Failed to add TextMeshProUGUI component");
@@ -64,7 +64,7 @@ namespace Plugins.Clean.Tests
             var textInstance = Object.Instantiate(prefab);
             var textComponent = textInstance.GetComponent<Text>();
 
-            var tmpComponent = Util.UpgradeText(textComponent);
+            var tmpComponent = Upgrade.UpgradeText(textComponent);
             PrefabUtility.SaveAsPrefabAsset(tmpComponent.gameObject, prefabPath);
 
             var tmpInstance = Object.Instantiate(prefab);
