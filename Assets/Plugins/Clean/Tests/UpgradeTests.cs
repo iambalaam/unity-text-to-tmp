@@ -1,14 +1,11 @@
 using System;
 using System.IO;
 using NUnit.Framework;
-using NUnit.Framework.Internal;
 using Plugins.Clean.Editor;
 using TMPro;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.TestTools;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
@@ -99,9 +96,6 @@ namespace Plugins.Clean.Tests
             {
                 Cleanup(guid);
             }
-
-
-
         }
 
         [Test]
@@ -120,16 +114,19 @@ namespace Plugins.Clean.Tests
 
                 // Upgrade component
                 Upgrade.UpgradeText(text);
-                
+
                 // Check scene override
-                Assert.IsNull(sceneInstance.GetComponent<Text>(), "Failed to remove Text component from prefab instance");
-                Assert.IsNotNull(sceneInstance.GetComponent<TextMeshProUGUI>(), "Failed to add TextMeshProUGUI component from prefab instance");
+                Assert.IsNull(sceneInstance.GetComponent<Text>(),
+                    "Failed to remove Text component from prefab instance");
+                Assert.IsNotNull(sceneInstance.GetComponent<TextMeshProUGUI>(),
+                    "Failed to add TextMeshProUGUI component from prefab instance");
                 Assert.AreEqual(sceneInstance.GetComponent<TextMeshProUGUI>().text, "scene override");
 
                 // Check prefab
                 var prefabInstance = Object.Instantiate(prefab);
                 Assert.IsNull(prefabInstance.GetComponent<Text>(), "Failed to remove Text component from prefab");
-                Assert.IsNotNull(prefabInstance.GetComponent<TextMeshProUGUI>(), "Failed to add TextMeshProUGUI component from prefab");
+                Assert.IsNotNull(prefabInstance.GetComponent<TextMeshProUGUI>(),
+                    "Failed to add TextMeshProUGUI component from prefab");
                 Assert.AreEqual(prefabInstance.GetComponent<TextMeshProUGUI>().text, "original text");
             }
             finally
