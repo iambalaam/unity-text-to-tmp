@@ -110,7 +110,11 @@ namespace Plugins.Clean.Editor
 
         public class TextMesh
         {
-            public TextMeshPro Apply()
+            public TextMesh(UnityEngine.TextMesh textMesh)
+            {
+                throw new NotImplementedException();
+            }
+            public TextMeshPro Apply(TextMesh textMesh)
             {
                 throw new NotImplementedException();
             }
@@ -196,6 +200,10 @@ namespace Plugins.Clean.Editor
 
         public class Dropdown
         {
+            public Dropdown(UnityEngine.UI.Dropdown dropdown)
+            {
+                throw new NotImplementedException();
+            }
             public TMP_Dropdown Apply()
             {
                 throw new NotImplementedException();

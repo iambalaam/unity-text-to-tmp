@@ -1,124 +1,43 @@
-using TMPro;
-using UnityEditor;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace Plugins.Clean.Editor
 {
-    public static class Upgrade
+    public class Upgrade
     {
-        public static TextMeshProUGUI UpgradeText(Text t)
+        private Dictionary<GameObject, ComponentProperties.Text> textCache =
+            new Dictionary<GameObject, ComponentProperties.Text>();
+        private Dictionary<GameObject, ComponentProperties.TextMesh> textMeshCache =
+            new Dictionary<GameObject, ComponentProperties.TextMesh>();
+        private Dictionary<GameObject, ComponentProperties.Dropdown> dropdownCache =
+            new Dictionary<GameObject, ComponentProperties.Dropdown>();
+        private Dictionary<GameObject, ComponentProperties.InputField> inputFieldCache =
+            new Dictionary<GameObject, ComponentProperties.InputField>();
+
+        private void CacheSceneOverrides(Scene scene)
         {
-            // Copy properties
-            var go = t.gameObject;
-            var properties = new ComponentProperties.Text(t);
-
-            // Swap Text component for TextMeshPropUGUI
-            Object.DestroyImmediate(t, true);
-            var tmp = go.AddComponent<TextMeshProUGUI>();
-
-            // Paste new properties
-            properties.Apply(tmp);
-            return tmp;
-        }
-
-        public static TMP_InputField UpgradeInputField(InputField input)
-        {
-            // Copy properties
-            var go = input.gameObject;
-            var properties = new ComponentProperties.InputField(input);
-
-            // Upgrade child components
-            TextMeshProUGUI textComponent = UpgradeText(input.textComponent);
-            Graphic placeholderComponent = (input.placeholder as Text)
-                ? UpgradeText((Text)input.placeholder)
-                : input.placeholder;
-
-            // Swap InputField component with TMP_InputField
-            Object.DestroyImmediate(input, true);
-            var tmpInput = go.AddComponent<TMP_InputField>();
-
-            // Paste child components
-            tmpInput.textComponent = textComponent;
-            tmpInput.placeholder = placeholderComponent;
-
-            // Paste new properties
-            properties.Apply(tmpInput);
-
-            // TMP InputField objects have an extra Viewport (Text Area) child object, create it if necessary
-            if (textComponent)
+            foreach (var go in scene.GetRootGameObjects())
             {
-                RectTransform viewport;
-                if (textComponent.transform.parent != tmpInput.transform)
-                    viewport = (RectTransform)textComponent.transform.parent;
-                else
-                    viewport = Util.CreateInputFieldViewport(tmpInput, textComponent, placeholderComponent);
-
-                if (!viewport.GetComponent<RectMask2D>())
-                    viewport.gameObject.AddComponent<RectMask2D>();
-
-                tmpInput.textViewport = viewport;
-            }
-
-            return tmpInput;
-        }
-
-        public static void RecursivelyUpgradeGameObject(GameObject go)
-        {
-            // Upgrade prefab
-            if (PrefabUtility.IsAnyPrefabInstanceRoot(go))
-            {
-                UpgradePrefabRoot(PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(go));
-            }
-            
-            // Upgrade components
-            var text = go.GetComponent<Text>();
-            var textMesh = go.GetComponent<TextMesh>();
-            var inputField = go.GetComponent<InputField>();
-            var dropdown = go.GetComponent<Dropdown>();
-            if (text) UpgradeText(text);
-            // TODO: if (textMesh) UpgradeTextMesh(textMesh);
-            if (inputField) UpgradeInputField(inputField);
-            // TODO: if (dropdown) UpgradeDropdown(dropdown);
-            
-            // Upgrade children
-            for (int i = 0; i < go.transform.childCount; i++)
-            {
-                RecursivelyUpgradeGameObject(go.transform.GetChild(i).gameObject);
+                RecursivelyCacheOverrides(go);
             }
         }
 
-        public static void UpgradePrefabRoot(string prefabPath)
+        private void RecursivelyCacheOverrides(GameObject root)
         {
-            Debug.Log(prefabPath);
-            GameObject prefabInstanceRoot = null;
-            try
+            Util.RecurseOverChildren(root, (go) =>
             {
-                var prefab = AssetDatabase.LoadMainAssetAtPath(prefabPath);
-                if (!CanPrefabBeUpgraded(prefab)) return;
-                prefabInstanceRoot = PrefabUtility.LoadPrefabContents(prefabPath);
-                RecursivelyUpgradeGameObject(prefabInstanceRoot);
+                var text = go.GetComponent<Text>();
+                var textMesh = go.GetComponent<TextMesh>();
+                var inputField = go.GetComponent<InputField>();
+                var dropdown = go.GetComponent<Dropdown>();
+                if (text) textCache.Add(go, new ComponentProperties.Text(text));
+                if (textMesh) textMeshCache.Add(go, new ComponentProperties.TextMesh(textMesh));
+                if (dropdown) dropdownCache.Add(go, new ComponentProperties.Dropdown(dropdown));
+                if (inputField) inputFieldCache.Add(go, new ComponentProperties.InputField(inputField));
 
-                prefab = PrefabUtility.SaveAsPrefabAsset(prefabInstanceRoot, prefabPath);
-                EditorUtility.SetDirty(prefab);
-            }
-            finally
-            {
-                if (prefabInstanceRoot)
-                {
-                    PrefabUtility.UnloadPrefabContents(prefabInstanceRoot);
-                }
-            }
-        }
-
-        public static bool CanPrefabBeUpgraded(Object prefab)
-        {
-            if (!prefab) return false;
-            if ((prefab.hideFlags & HideFlags.NotEditable) == HideFlags.NotEditable) return false;
-            var type = PrefabUtility.GetPrefabAssetType(prefab);
-            if (type != PrefabAssetType.Regular && type != PrefabAssetType.Variant) return false;
-            
-            return true;
+            });
         }
     }
 }

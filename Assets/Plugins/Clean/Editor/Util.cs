@@ -177,5 +177,14 @@ namespace Plugins.Clean.Editor
             var field = GetUnityPersistentCalls();
             field.SetValue(target, unityEvent);
         }
+
+        public static void RecurseOverChildren(GameObject root, Action<GameObject> action)
+        {
+            action(root);
+            for (int i = 0; i < root.transform.childCount; i++)
+            {
+                RecurseOverChildren(root.transform.GetChild(i).gameObject, action);
+            }
+        }
     }
 }

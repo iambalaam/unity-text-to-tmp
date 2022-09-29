@@ -12,7 +12,7 @@ using Object = UnityEngine.Object;
 namespace Plugins.Clean.Tests
 {
     [TestFixture]
-    public class UpgradeTests
+    public class ComponentUpgradeTests
     {
         private static Text CreateText(string text)
         {
@@ -58,7 +58,7 @@ namespace Plugins.Clean.Tests
             var textComponent = CreateText(testText);
             var go = textComponent.gameObject;
 
-            Upgrade.UpgradeText(textComponent);
+            ComponentUpgrade.UpgradeText(textComponent);
 
             var tmp = go.GetComponent<TextMeshProUGUI>();
             Assert.IsNotNull(tmp, "Failed to add TextMeshProUGUI component");
@@ -78,8 +78,8 @@ namespace Plugins.Clean.Tests
                 // Create prefab
                 CreateTextPrefab("original text", prefabPath);
 
-                // Upgrade prefab
-                Upgrade.UpgradePrefabRoot(prefabPath);
+                // ComponentUpgrade prefab
+                ComponentUpgrade.UpgradePrefabRoot(prefabPath);
 
                 // Instantiate clone
                 tmpInstance = PrefabUtility.LoadPrefabContents(prefabPath);
@@ -114,8 +114,8 @@ namespace Plugins.Clean.Tests
                 text.text = "scene override";
                 EditorSceneManager.SaveScene(scene, $"Assets/{guid}/test-scene.unity");
 
-                // Upgrade component
-                Upgrade.UpgradeText(text);
+                // ComponentUpgrade component
+                ComponentUpgrade.UpgradeText(text);
 
                 // Check scene override
                 Assert.IsNull(sceneInstance.GetComponent<Text>(),
