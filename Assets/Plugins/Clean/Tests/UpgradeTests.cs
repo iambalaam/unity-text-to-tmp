@@ -36,7 +36,6 @@ namespace Plugins.Clean.Tests
         public string Setup()
         {
             var guid = Guid.NewGuid().ToString();
-            Debug.Log(guid);
             if (!Directory.Exists($"Assets/{guid}")) ;
             {
                 AssetDatabase.CreateFolder("Assets", guid);
@@ -72,28 +71,31 @@ namespace Plugins.Clean.Tests
         {
             var guid = Setup();
             var prefabPath = $"Assets/{guid}/text.prefab";
+            GameObject tmpInstance = null;
 
             try
             {
-                var prefab = CreateTextPrefab("original text", prefabPath);
-                var textInstance = Object.Instantiate(prefab);
-                var textComponent = textInstance.GetComponent<Text>();
+                // Create prefab
+                CreateTextPrefab("original text", prefabPath);
 
-                var tmpComponent = Upgrade.UpgradeText(textComponent);
-                PrefabUtility.SaveAsPrefabAsset(tmpComponent.gameObject, prefabPath);
+                // Upgrade prefab
+                Upgrade.UpgradePrefabRoot(prefabPath);
 
-                var tmpInstance = Object.Instantiate(prefab);
+                // Instantiate clone
+                tmpInstance = PrefabUtility.LoadPrefabContents(prefabPath);
                 var tmp = tmpInstance.GetComponent<TextMeshProUGUI>();
 
-                Assert.IsNull(textInstance.GetComponent<Text>(),
+                // Check clone
+                Assert.IsNull(tmpInstance.GetComponent<Text>(),
                     "Failed to remove Text component from prefab instance");
-                Assert.IsNotNull(textInstance.GetComponent<TextMeshProUGUI>(),
+                Assert.IsNotNull(tmpInstance.GetComponent<TextMeshProUGUI>(),
                     "Failed to add TextMeshProUGUI component to existing prefab instance");
                 Assert.IsNotNull(tmp, "Failed to add TextMeshProUGUI component to new prefab instance");
                 Assert.AreEqual(tmp.text, "original text");
             }
             finally
             {
+                if (tmpInstance != null) PrefabUtility.UnloadPrefabContents(tmpInstance);
                 Cleanup(guid);
             }
         }
