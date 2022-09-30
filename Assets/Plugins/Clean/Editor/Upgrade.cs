@@ -1,20 +1,28 @@
+using System;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Object = UnityEngine.Object;
 
 namespace Plugins.Clean.Editor
 {
     public class Upgrade
     {
-        private Dictionary<GameObject, ComponentProperties.Text> textCache =
-            new Dictionary<GameObject, ComponentProperties.Text>();
-        private Dictionary<GameObject, ComponentProperties.TextMesh> textMeshCache =
-            new Dictionary<GameObject, ComponentProperties.TextMesh>();
-        private Dictionary<GameObject, ComponentProperties.Dropdown> dropdownCache =
-            new Dictionary<GameObject, ComponentProperties.Dropdown>();
-        private Dictionary<GameObject, ComponentProperties.InputField> inputFieldCache =
-            new Dictionary<GameObject, ComponentProperties.InputField>();
+        private List<KeyValuePair<GameObject, ComponentProperties.Text>> textCache =
+            new List<KeyValuePair<GameObject, ComponentProperties.Text>>();
+
+        private List<KeyValuePair<GameObject, ComponentProperties.TextMesh>> textMeshCache =
+            new List<KeyValuePair<GameObject, ComponentProperties.TextMesh>>();
+
+        private List<KeyValuePair<GameObject, ComponentProperties.Dropdown>> dropdownCache =
+            new List<KeyValuePair<GameObject, ComponentProperties.Dropdown>>();
+
+        private List<KeyValuePair<GameObject, ComponentProperties.InputField>> inputFieldCache =
+            new List<KeyValuePair<GameObject, ComponentProperties.InputField>>();
+
+        private HashSet<string> updatedPrefabs = new HashSet<string>();
 
         private void CacheSceneOverrides(Scene scene)
         {
@@ -32,12 +40,53 @@ namespace Plugins.Clean.Editor
                 var textMesh = go.GetComponent<TextMesh>();
                 var inputField = go.GetComponent<InputField>();
                 var dropdown = go.GetComponent<Dropdown>();
-                if (text) textCache.Add(go, new ComponentProperties.Text(text));
-                if (textMesh) textMeshCache.Add(go, new ComponentProperties.TextMesh(textMesh));
-                if (dropdown) dropdownCache.Add(go, new ComponentProperties.Dropdown(dropdown));
-                if (inputField) inputFieldCache.Add(go, new ComponentProperties.InputField(inputField));
-
+                if (text)
+                    textCache.Add(
+                        new KeyValuePair<GameObject, ComponentProperties.Text>(go,
+                            new ComponentProperties.Text(text)));
+                if (textMesh)
+                    textMeshCache.Add(
+                        new KeyValuePair<GameObject, ComponentProperties.TextMesh>(go,
+                            new ComponentProperties.TextMesh(textMesh)));gi
+                if (dropdown)
+                    dropdownCache.Add(
+                        new KeyValuePair<GameObject, ComponentProperties.Dropdown>(go,
+                            new ComponentProperties.Dropdown(dropdown)));
+                if (inputField)
+                    inputFieldCache.Add(
+                        new KeyValuePair<GameObject, ComponentProperties.InputField>(go,
+                            new ComponentProperties.InputField(inputField)));
             });
+        }
+
+        public void TextToTMP(Scene[] scenes, string[] prefabPaths)
+        {
+            foreach (var scene in scenes)
+            {
+                // Load and cache scenes
+                if (scene.isDirty) throw new Exception($"Scene {scene.name}is not saved");
+                if (!scene.isLoaded) SceneManager.LoadScene(scene.buildIndex, LoadSceneMode.Additive);
+                CacheSceneOverrides(scene);
+
+                // Upgrade prefabs
+                foreach (var prefabPath in prefabPaths)
+                {
+                    ComponentUpgrade.UpgradePrefabRoot(prefabPath);
+                }
+
+                // TODO: Upgrade scene components
+
+                // Reapply cached overrides
+                foreach (var pair in textCache)
+                    pair.Value.Apply(pair.Key.GetComponent<TextMeshProUGUI>());
+                foreach (var pair in textMeshCache)
+                    pair.Value.Apply(pair.Key.GetComponent<TextMeshPro>());
+                foreach (var pair in inputFieldCache)
+                    pair.Value.Apply(pair.Key.GetComponent<TMP_InputField>());
+                foreach (var pair in dropdownCache)
+                    pair.Value.Apply(pair.Key.GetComponent<TMP_Dropdown>());
+
+            }
         }
     }
 }
