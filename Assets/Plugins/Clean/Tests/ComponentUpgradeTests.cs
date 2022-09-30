@@ -6,6 +6,7 @@ using TMPro;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
@@ -107,15 +108,16 @@ namespace Plugins.Clean.Tests
             try
             {
                 // Setup scene override
-                var prefab = CreateTextPrefab("original text", $"Assets/{guid}/text.prefab");
+                var prefabPath = $"Assets/{guid}/text.prefab";
+                var prefab = CreateTextPrefab("original text", prefabPath);
                 var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
-                var sceneInstance = Object.Instantiate(prefab);
-                var text = sceneInstance.GetComponent<Text>();
+                var sceneInstance = PrefabUtility.InstantiatePrefab(prefab) as GameObject;
+                var text = sceneInstance!.GetComponent<Text>();
                 text.text = "scene override";
                 EditorSceneManager.SaveScene(scene, $"Assets/{guid}/test-scene.unity");
 
                 // ComponentUpgrade component
-                ComponentUpgrade.UpgradeText(text);
+                new Upgrade().TextToTMP(new Scene[]{scene}, new string[]{prefabPath});
 
                 // Check scene override
                 Assert.IsNull(sceneInstance.GetComponent<Text>(),
@@ -125,8 +127,8 @@ namespace Plugins.Clean.Tests
                 Assert.AreEqual(sceneInstance.GetComponent<TextMeshProUGUI>().text, "scene override");
 
                 // Check prefab
-                var prefabInstance = Object.Instantiate(prefab);
-                Assert.IsNull(prefabInstance.GetComponent<Text>(), "Failed to remove Text component from prefab");
+                var prefabInstance = PrefabUtility.InstantiatePrefab(prefab) as GameObject;
+                Assert.IsNull(prefabInstance!.GetComponent<Text>(), "Failed to remove Text component from prefab");
                 Assert.IsNotNull(prefabInstance.GetComponent<TextMeshProUGUI>(),
                     "Failed to add TextMeshProUGUI component from prefab");
                 Assert.AreEqual(prefabInstance.GetComponent<TextMeshProUGUI>().text, "original text");

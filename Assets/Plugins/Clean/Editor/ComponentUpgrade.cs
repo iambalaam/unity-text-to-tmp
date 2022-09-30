@@ -98,7 +98,6 @@ namespace Plugins.Clean.Editor
 
         public static void UpgradePrefabRoot(string prefabPath)
         {
-            Debug.Log(prefabPath);
             GameObject prefabInstanceRoot = null;
             try
             {

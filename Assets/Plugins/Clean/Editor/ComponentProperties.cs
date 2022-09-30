@@ -114,7 +114,7 @@ namespace Plugins.Clean.Editor
             {
                 throw new NotImplementedException();
             }
-            public TextMeshPro Apply(TextMesh textMesh)
+            public TextMeshPro Apply(TextMeshPro textMeshPro)
             {
                 throw new NotImplementedException();
             }
@@ -204,7 +204,7 @@ namespace Plugins.Clean.Editor
             {
                 throw new NotImplementedException();
             }
-            public TMP_Dropdown Apply()
+            public TMP_Dropdown Apply(TMP_Dropdown dropdown)
             {
                 throw new NotImplementedException();
             }
