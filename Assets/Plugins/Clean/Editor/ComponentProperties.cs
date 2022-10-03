@@ -111,13 +111,50 @@ namespace Plugins.Clean.Editor
 
         public class TextMesh
         {
+            private TextAnchor anchor;
+            private float characterSize;
+            private Color color;
+            private Font font;
+            private int fontSize;
+            private FontStyle fontStyle;
+            private float lineSpacing;
+            private float offsetZ;
+            private bool richText;
+            private string text;
+            
+
             public TextMesh(UnityEngine.TextMesh textMesh)
             {
-                throw new NotImplementedException();
+                anchor = textMesh.anchor;
+                characterSize = textMesh.characterSize;
+                color = textMesh.color;
+                font = textMesh.font;
+                fontSize = textMesh.fontSize;
+                fontStyle = textMesh.fontStyle;
+                lineSpacing = textMesh.lineSpacing;
+                offsetZ = textMesh.offsetZ;
+                richText = textMesh.richText;
+                text = textMesh.text;
             }
-            public TextMeshPro Apply(TextMeshPro textMeshPro)
+            
+            public TextMeshPro Apply(TextMeshPro tmp)
             {
-                throw new NotImplementedException();
+                tmp.alignment = Util.GetTMPAlignment(anchor, false);
+                tmp.color = color;
+                // TODO: textMeshPro.font = Util.GetCorrespondingTMPFontAsset();
+                // TODO: textMeshPro.fontMaterial = Util.GetCorrespondingTMPFontAsset();?
+                tmp.fontSize = fontSize > 0 ? fontSize : 13;
+                tmp.fontStyle = Util.GetTMPFontStyle(fontStyle);
+                tmp.lineSpacing = lineSpacing;
+                tmp.richText = richText;
+                tmp.text = text;
+                tmp.enableWordWrapping = false;
+                tmp.overflowMode = TextOverflowModes.Overflow;
+                tmp.rectTransform.sizeDelta = Vector2.zero;
+                tmp.rectTransform.localScale *= characterSize;
+                tmp.rectTransform.Translate(Vector3.forward * offsetZ);
+
+                return tmp;
             }
         }
 

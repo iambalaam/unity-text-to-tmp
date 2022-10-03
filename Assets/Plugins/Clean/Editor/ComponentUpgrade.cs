@@ -67,14 +67,26 @@ namespace Plugins.Clean.Editor
 
         public static TextMeshPro UpgradeTextMesh(TextMesh textMesh)
         {
-            throw new NotImplementedException();
+            // Copy properties
+            var go = textMesh.gameObject;
+            var properties = new ComponentProperties.TextMesh(textMesh);
+
+            // Replace TextMesh with TextMeshPro
+            Object.DestroyImmediate(textMesh);
+            var tmp = go.AddComponent<TextMeshPro>();
+
+            // Paste properties
+            properties.Apply(tmp);
+
+            return tmp;
         }
+
         public static TMP_Dropdown UpgradeDropdown(Dropdown dropdown)
         {
             // Copy properties
             var go = dropdown.gameObject;
             var properties = new ComponentProperties.Dropdown(dropdown);
-            
+
             // Upgrade child components
             TextMeshProUGUI captionText = null;
             if (dropdown.captionText) captionText = UpgradeText(dropdown.captionText);
@@ -84,14 +96,14 @@ namespace Plugins.Clean.Editor
             // Replace Dropdown with TMP_Dropdown
             Object.DestroyImmediate(dropdown, true);
             var tmpDropdown = go.AddComponent<TMP_Dropdown>();
-            
+
             // Paste child components
             if (captionText) tmpDropdown.captionText = captionText;
             if (itemText) tmpDropdown.itemText = itemText;
 
             // Paste properties
             properties.Apply(tmpDropdown);
-            
+
             return tmpDropdown;
         }
 
