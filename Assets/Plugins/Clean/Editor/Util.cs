@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using TMPro;
 using UnityEditor;
@@ -150,6 +151,18 @@ namespace Plugins.Clean.Editor
                 case InputField.LineType.SingleLine: return TMP_InputField.LineType.SingleLine;
                 default: return TMP_InputField.LineType.SingleLine;
             }
+        }
+
+        public static List<TMP_Dropdown.OptionData> GetTMPDropdownOptions(List<Dropdown.OptionData> options)
+        {
+            if (options == null) return null;
+            var newOptions = new List<TMP_Dropdown.OptionData>(options.Count);
+            foreach (var option in options)
+            {
+                newOptions.Add(new TMP_Dropdown.OptionData(option.text, option.image));
+            }
+            
+            return newOptions;
         }
 
         // TODO: Investigate if there is/should be a public API for this

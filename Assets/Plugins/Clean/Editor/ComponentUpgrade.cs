@@ -30,8 +30,8 @@ namespace Plugins.Clean.Editor
             var go = input.gameObject;
             var properties = new ComponentProperties.InputField(input);
 
-            // ComponentUpgrade child components
-            TextMeshProUGUI textComponent = UpgradeText(input.textComponent);
+            // Upgrade child components
+            var textComponent = UpgradeText(input.textComponent);
             Graphic placeholderComponent = (input.placeholder as Text)
                 ? UpgradeText((Text)input.placeholder)
                 : input.placeholder;
@@ -71,7 +71,28 @@ namespace Plugins.Clean.Editor
         }
         public static TMP_Dropdown UpgradeDropdown(Dropdown dropdown)
         {
-            throw new NotImplementedException();
+            // Copy properties
+            var go = dropdown.gameObject;
+            var properties = new ComponentProperties.Dropdown(dropdown);
+            
+            // Upgrade child components
+            TextMeshProUGUI captionText = null;
+            if (dropdown.captionText) captionText = UpgradeText(dropdown.captionText);
+            TextMeshProUGUI itemText = null;
+            if (dropdown.itemText) itemText = UpgradeText(dropdown.itemText);
+
+            // Replace Dropdown with TMP_Dropdown
+            Object.DestroyImmediate(dropdown, true);
+            var tmpDropdown = go.AddComponent<TMP_Dropdown>();
+            
+            // Paste child components
+            if (captionText) tmpDropdown.captionText = captionText;
+            if (itemText) tmpDropdown.itemText = itemText;
+
+            // Paste properties
+            properties.Apply(tmpDropdown);
+            
+            return tmpDropdown;
         }
 
         public static void RecursivelyUpgradeGameObject(GameObject root)

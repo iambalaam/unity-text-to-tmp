@@ -102,6 +102,19 @@ namespace Plugins.Clean.Tests
         }
 
         [Test]
+        public void ComponentUpgrade_Dropdown_WithChildren()
+        {
+            var prefab = PrefabUtility.LoadPrefabContents("Assets/Plugins/Clean/Tests/Prefabs/Dropdown.prefab");
+            var go = Object.Instantiate(prefab);
+            var dropdown = go.GetComponent<Dropdown>();
+
+            Assert.AreEqual("Option A", dropdown.GetComponentsInChildren<Text>()[0].text);
+            var tmpDropdown = ComponentUpgrade.UpgradeDropdown(dropdown);
+            Assert.AreEqual(0, tmpDropdown.GetComponentsInChildren<Text>().Length);
+            Assert.AreEqual("Option A", tmpDropdown.GetComponentsInChildren<TextMeshProUGUI>()[0].text);
+        }
+
+        [Test]
         public void CanUpgradePrefabWithSceneOverrides()
         {
             var guid = Setup();
@@ -117,7 +130,7 @@ namespace Plugins.Clean.Tests
                 EditorSceneManager.SaveScene(scene, $"Assets/{guid}/test-scene.unity");
 
                 // ComponentUpgrade component
-                new Upgrade().TextToTMP(new Scene[]{scene}, new string[]{prefabPath});
+                new Upgrade().TextToTMP(new Scene[] { scene }, new string[] { prefabPath });
 
                 // Check scene override
                 Assert.IsNull(sceneInstance.GetComponent<Text>(),

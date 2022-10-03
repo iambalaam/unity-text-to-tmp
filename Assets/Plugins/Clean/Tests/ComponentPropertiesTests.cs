@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using NUnit.Framework;
 using Plugins.Clean.Editor;
 using TMPro;
@@ -31,6 +32,27 @@ namespace Plugins.Clean.Tests
             copy.Apply(tmp);
         
             Assert.AreEqual("testing123", tmp.text);
+        }
+
+        [Test]
+        public void ComponentProperties_Dropdown_CopiesOptions()
+        {
+            var go1 = new GameObject();
+            var dropdown = go1.AddComponent<Dropdown>();
+            dropdown.options = new List<Dropdown.OptionData>
+            {
+                new("option 1"),
+                new("option 2")
+            };
+            var properties = new ComponentProperties.Dropdown(dropdown);
+
+            var go2 = new GameObject();
+            var tmpDropdown = go2.AddComponent<TMP_Dropdown>();
+            properties.Apply(tmpDropdown);
+
+            Assert.AreEqual(2, tmpDropdown.options.Count, "Failed to copy all options");
+            Assert.AreEqual("option 1", tmpDropdown.options[0].text, "Failed to copy first option");
+            Assert.AreEqual("option 2", tmpDropdown.options[1].text, "Failed to copy second option");
         }
     }
 }

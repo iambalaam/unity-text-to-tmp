@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -200,13 +201,43 @@ namespace Plugins.Clean.Editor
 
         public class Dropdown
         {
+            private bool enabled;
+            private Vector2 sizeDelta;
+            private SelectableObject selectable;
+            private Image captionImage;
+            private Image itemImage;
+            private RectTransform template;
+            private int value;
+            private List<UnityEngine.UI.Dropdown.OptionData> options;
+            private object onValueChanged;
+            
             public Dropdown(UnityEngine.UI.Dropdown dropdown)
             {
-                throw new NotImplementedException();
+                enabled = dropdown.enabled;
+                sizeDelta = ((RectTransform)dropdown.transform).sizeDelta;
+                selectable = new SelectableObject(dropdown);
+                captionImage = dropdown.captionImage;
+                itemImage = dropdown.itemImage;
+                template = dropdown.template;
+                value = dropdown.value;
+                options = dropdown.options;
+                // Unity Events
+                onValueChanged = Util.CopyUnityEvent(dropdown.onValueChanged);
             }
             public TMP_Dropdown Apply(TMP_Dropdown dropdown)
             {
-                throw new NotImplementedException();
+                dropdown.enabled = enabled;
+                ((RectTransform) dropdown.transform).sizeDelta = sizeDelta;
+                selectable.Apply(dropdown);
+                dropdown.captionImage = captionImage;
+                dropdown.itemImage = itemImage;
+                dropdown.options = Util.GetTMPDropdownOptions(options);
+                dropdown.template = template;
+                dropdown.value = value;
+                // Unity Events
+                Util.PasteUnityEvent(dropdown.onValueChanged, onValueChanged);
+                
+                return dropdown;
             }
         }
     }
