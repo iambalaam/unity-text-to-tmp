@@ -59,6 +59,25 @@ namespace Plugins.Clean.Editor
             });
         }
 
+        private void UpgradeAllPrefabs(IEnumerable<string> prefabPaths)
+        {
+            foreach (var prefabPath in prefabPaths)
+            {
+                ComponentUpgrade.UpgradePrefabRoot(prefabPath);
+            }
+        }
+
+        private void UpgradeAllSceneObjects(IEnumerable<Scene> scenes)
+        {
+            foreach (var scene in scenes)
+            {
+                foreach (var root in scene.GetRootGameObjects())
+                {
+                    ComponentUpgrade.RecursivelyUpgradeGameObject(root);
+                }
+            }
+        }
+
         public void TextToTMP(Scene[] scenes, string[] prefabPaths)
         {
             foreach (var scene in scenes)
@@ -68,13 +87,8 @@ namespace Plugins.Clean.Editor
                 if (!scene.isLoaded) SceneManager.LoadScene(scene.buildIndex, LoadSceneMode.Additive);
                 CacheSceneOverrides(scene);
 
-                // Upgrade prefabs
-                foreach (var prefabPath in prefabPaths)
-                {
-                    ComponentUpgrade.UpgradePrefabRoot(prefabPath);
-                }
-
-                // TODO: Upgrade scene components
+                UpgradeAllPrefabs(prefabPaths);
+                UpgradeAllSceneObjects(scenes);
 
                 // Reapply cached overrides
                 foreach (var pair in textCache)
@@ -88,5 +102,7 @@ namespace Plugins.Clean.Editor
 
             }
         }
+
+
     }
 }
