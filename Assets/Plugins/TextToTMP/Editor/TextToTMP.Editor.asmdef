@@ -1,7 +1,8 @@
 {
     "name": "TextToTMP.Editor",
     "references": [
-        "Unity.TextMeshPro"
+        "Unity.TextMeshPro",
+        "Clean"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [

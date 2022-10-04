@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using Plugins.Clean.Editor;
 using TMPro;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -386,7 +388,20 @@ namespace TextToTMPNamespace
 				if( GUILayout.Button( "UPGRADE COMPONENTS", GL_HEIGHT_30 ) )
 				{
 					AssetDatabase.SaveAssets();
-					UpgradeComponents();
+					// UpgradeComponents();
+					List<Scene> scenes = new List<Scene>();
+					foreach (var scenePath in scenesToUpgrade)
+					{
+						scenes.Add(SceneManager.GetSceneByPath(scenePath));
+					}
+
+					List<string> assets = new List<string>();
+					foreach (var assetPath in assetsToUpgrade)
+					{
+						assets.Add(assetPath);
+					}
+
+					new Upgrade().TextToTMP(scenes.ToArray(), assetsToUpgrade.ToArray());
 					SwitchStage( UpgradeStage.UpdateReferences );
 				}
 				GUI.enabled = true;
