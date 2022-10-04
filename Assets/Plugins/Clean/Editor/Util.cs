@@ -191,6 +191,16 @@ namespace Plugins.Clean.Editor
             field.SetValue(target, unityEvent);
         }
 
+        public static bool CanPrefabBeUpgraded(Object prefab)
+        {
+            if (!prefab) return false;
+            if ((prefab.hideFlags & HideFlags.NotEditable) == HideFlags.NotEditable) return false;
+            var type = PrefabUtility.GetPrefabAssetType(prefab);
+            if (type != PrefabAssetType.Regular && type != PrefabAssetType.Variant) return false;
+
+            return true;
+        }
+
         public static void RecurseOverChildren(GameObject root, Action<GameObject> action)
         {
             action(root);

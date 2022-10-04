@@ -136,7 +136,7 @@ namespace Plugins.Clean.Editor
             {
                 // Check we can upgrade
                 var prefab = AssetDatabase.LoadMainAssetAtPath(prefabPath);
-                if (!CanPrefabBeUpgraded(prefab)) return;
+                if (!Util.CanPrefabBeUpgraded(prefab)) return;
 
                 // Load contents + upgrade
                 prefabInstanceRoot = PrefabUtility.LoadPrefabContents(prefabPath);
@@ -152,16 +152,6 @@ namespace Plugins.Clean.Editor
                     PrefabUtility.UnloadPrefabContents(prefabInstanceRoot);
                 }
             }
-        }
-
-        public static bool CanPrefabBeUpgraded(Object prefab)
-        {
-            if (!prefab) return false;
-            if ((prefab.hideFlags & HideFlags.NotEditable) == HideFlags.NotEditable) return false;
-            var type = PrefabUtility.GetPrefabAssetType(prefab);
-            if (type != PrefabAssetType.Regular && type != PrefabAssetType.Variant) return false;
-
-            return true;
         }
     }
 }
